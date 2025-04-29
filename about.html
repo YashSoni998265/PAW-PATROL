@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Rescue - About Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a1a1f, #1e2f3d, #2f4a5c);
+            background-size: 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(220, 38, 38, 0.4);
+        }
+
+        
+        .nav-bg {
+            background: linear-gradient(90deg, #b91c1c, #dc2626);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #f97316;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after {
+            width: 60%;
+        }
+
+        
+        marquee {
+            background: linear-gradient(45deg, #dc2626, #f43f5e);
+            padding: 12px 0;
+            font-weight: 600;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .marquee-link {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .marquee-link:hover {
+            color: #fed7aa;
+            text-decoration: underline;
+        }
+
+        
+        .container-custom {
+            max-width: 48rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 1rem;
+        }
+
+        
+        .section-title {
+            color: #f97316;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .section-subtitle {
+            color: #d1d5db;
+            font-size: 0.875rem;
+        }
+
+        .stat-number {
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .stat-label {
+            color: #d1d5db;
+            font-size: 1rem;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #ef4444, #f97316);
+            color: #ffffff;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .step-title {
+            color: #f97316;
+            font-weight: 600;
+        }
+
+        .team-member img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .team-member img:hover {
+            transform: scale(1.1);
+        }
+
+        .team-member h4 {
+            color: #f97316;
+            font-weight: 600;
+        }
+
+        .team-member p {
+            color: #d1d5db;
+            font-size: 0.875rem;
+        }
+
+        
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: linear-gradient(90deg, #b91c1c, #dc2626);
+                padding: 2rem;
+                border-radius: 0 0 24px 24px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    
+    <nav class="nav-bg text-white p-4 sticky top-0 z-20">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-4xl font-extrabold tracking-tight">Paw Patrol 🐾</h1>
+            <div class="flex items-center space-x-4">
+                <div id="navLinks" class="nav-links flex space-x-4">
+                    <a href="index.html" class="hover:text-white/80">Home</a>
+                    <a href="ngo-register.html" class="hover:text-white/80">NGO Register</a>
+                    <a href="vet-register.html" class="hover:text-white/80">Vet Register</a>
+                    <a href="ngo-dashboard.html" class="hover:text-white/80">NGO Dashboard</a>
+                    <a href="vet-dashboard.html" class="hover:text-white/80">Vet Dashboard</a>
+                    <a href="about.html" class="hover:text-white/80">About</a>
+                    <a href="contact.html" class="hover:text-white/80">Contact</a>
+                </div>
+                <button id="menuToggle" class="sm:hidden p-2"><i class="fas fa-bars text-2xl"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    
+    <marquee direction="right" class="text-white py-3 text-center">
+        <a href="https://drive.google.com/file/d/1du-beuQ0TN7b_j2Bdk95CoM4ya_sIQCV/view?usp=drive_link" class="marquee-link">Click here for Quick First Aid Guide</a>
+    </marquee>
+
+    
+    <main class="container-custom py-16 animate-fade-in">
+        
+        <section class="mb-16">
+            <h2 class="section-title mb-2">About Us</h2>
+            <p class="section-subtitle mb-8">Our mission, vision and how we help injured animals</p>
+
+            
+            <div class="flex flex-col md:flex-row items-center gap-8 mb-12 glass-card p-8">
+                <img src="./5.png" alt="Animals" class="w-full md:w-1/2 rounded-lg">
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-bold text-[#f97316] mb-4">Our Mission</h3>
+                    <p>
+                        At Paw Patrol, we are dedicated to connecting injured animals with nearby NGOs for immediate rescue and care. Our platform enables quick response times and efficient communication between concerned citizens and animal welfare organizations. With advanced AI-powered detection, we aim to reduce the suffering of injured animals and provide them with the care they need as quickly as possible. Our real-time alert and tracking system ensures that NGOs are notified immediately when a case is in their vicinity.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-8 mb-12 glass-card p-8">
+                <img src="./1.jpeg" alt="Animals" class="w-full md:w-1/2 rounded-lg">
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-bold text-[#f97316] mb-4">Why Choose Us?</h3>
+                    <p>
+                        "When an animal is injured or lost, time is of the essence. Traditional methods of seeking help often involve a frantic and time-consuming process of calling multiple shelters, NGOs, and veterinary clinics, with no guarantee of immediate assistance. You might find yourself making numerous calls, facing unanswered lines, or struggling to connect with the right resources in your vicinity. This delay can be critical, impacting the animal's well-being and chances of recovery.
+
+Our platform offers a revolutionary alternative. We understand the urgency and frustration of these traditional methods, and that's why we've built a smarter, faster, and more reliable solution. With our intuitive system, you simply upload an image of the animal in need. Our advanced AI instantly verifies the situation and immediately alerts a network of verified animal welfare organizations and veterinary professionals in the animal's precise location.
+                    </p>
+                </div>
+            </div>
+
+            
+            <div class="glass-card p-8">
+                <h3 class="section-title mb-6">Our Impact</h3>
+                <div class="flex flex-col md:flex-row justify-between text-center gap-8">
+                    <div>
+                        <p class="stat-number">500+</p>
+                        <p class="stat-label">Animals Rescued</p>
+                    </div>
+                    <div>
+                        <p class="stat-number">50+</p>
+                        <p class="stat-label">NGO Partners</p>
+                    </div>
+                    <div>
+                        <p class="stat-number">20+</p>
+                        <p class="stat-label">Cities Covered</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="mb-16 glass-card p-8">
+            <h2 class="section-title mb-8">How It Works</h2>
+            <div class="space-y-6">
+                <div class="flex items-start gap-4">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h4 class="step-title text-lg mb-1">Report an Injured Animal</h4>
+                        <p>Take a photo of the injured animal and upload it through the platform. AI verifies its need before processing.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h4 class="step-title text-lg mb-1">Automatic Location Detection</h4>
+                        <p>We auto-detect your location using GPS technology, ensuring the closest NGOs can be notified for a quicker response time.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h4 class="step-title text-lg mb-1">Alert Nearby NGOs</h4>
+                        <p>The system sends immediate alerts with images & location details to all registered NGOs within the radius.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="step-number">4</div>
+                    <div>
+                        <h4 class="step-title text-lg mb-1">Real-time Tracking</h4>
+                        <p>Once an NGO accepts the request, both the reporter and the NGO can track each other’s location in real-time for efficient rescue coordination.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="glass-card p-8">
+            <h2 class="section-title mb-2">Our Team</h2>
+            <p class="section-subtitle mb-8">Meet the people behind Paw Patrol</p>
+            <div class="flex flex-col md:flex-row justify-center gap-12 text-center">
+                <div class="team-member">
+                    <img src="./2.jpeg" alt="Yash Soni">
+                    <h4 class="text-lg mt-4 mb-1">Yash Soni</h4>
+                    <p>Founder & CEO</p>
+                </div>
+                <div class="team-member">
+                    <img src="./3.jpeg" alt="Akshat Agarwal">
+                    <h4 class="text-lg mt-4 mb-1">Rahul Verma</h4>
+                    <p>Co Founder & AI Engineer</p>
+                </div>
+                <div class="team-member">
+                    <img src="./4.png" alt="Amay Anand Kainedi">
+                    <h4 class="text-lg mt-4 mb-1">Amay Anand Kainedi</h4>
+                    <p>Co Founder and Backend Expert</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-[linear-gradient(135deg,#0a1a1f,#1e2f3d,#2f4a5c)] text-white py-2">
+        <div class="container mx-auto px-3 text-center">
+            <div class="flex justify-center space-x-6 mb-2">
+                <a href="https://twitter.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-twitter fa-lg"></i>
+                </a>
+                <a href="https://instagram.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-instagram fa-lg"></i>
+                </a>
+                <a href="https://facebook.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-facebook-f fa-lg"></i>
+                </a>
+                <a href="https://linkedin.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-linkedin-in fa-lg"></i>
+                </a>
+            </div>
+            <p class="text-[0.7rem] font-semibold mb-0.5">
+                Proudly developed during the <a href="#" class="text-[#ef4444] hover:text-[#f97316] transition-colors">TechFlix Hackin Bad Hackathon</a>
+            </p>
+            <p class="text-[0.6rem] text-gray-400">© 2025 Animal Rescue. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

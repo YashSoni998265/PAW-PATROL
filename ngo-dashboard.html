@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Rescue - NGO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js" onerror="this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js'"></script>
+    <script src="https://unpkg.com/leaflet.polyline.decorator@0.7.2/dist/leaflet.polylineDecorator.js" onerror="this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet.polyline.decorator/0.7.2/leaflet.polylineDecorator.min.js'"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a1a1f, #1e2f3d, #2f4a5c);
+            background-size: 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(220, 38, 38, 0.4);
+        }
+
+        
+        .btn-vibrant {
+            background: linear-gradient(45deg, #ef4444, #f97316);
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-vibrant:hover {
+            background: linear-gradient(45deg, #b91c1c, #c2410c);
+            transform: scale(1.12);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-vibrant::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-vibrant:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        
+        .btn-gray {
+            background: linear-gradient(45deg, #6b7280, #4b5563);
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-gray:hover {
+            background: linear-gradient(45deg, #4b5563, #374151);
+            transform: scale(1.12);
+            box-shadow: 0 0 25px rgba(107, 114, 128, 0.6);
+        }
+
+        .btn-gray::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-gray:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        
+        .nav-bg {
+            background: linear-gradient(90deg, #b91c1c, #dc2626);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #f97316;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after {
+            width: 60%;
+        }
+
+        
+        marquee {
+            background: linear-gradient(45deg, #dc2626, #f43f5e);
+            padding: 12px 0;
+            font-weight: 600;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .marquee-link {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .marquee-link:hover {
+            color: #fed7aa;
+            text-decoration: underline;
+        }
+
+        
+        #map {
+            height: 480px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        #map:hover {
+            transform: scale(1.02);
+        }
+
+        .pulse-marker {
+            background: #ef4444;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 1);
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        
+        input[type="email"],
+        input[type="password"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            padding: 14px;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #f97316;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+        }
+
+        
+        .notification-banner {
+            background: linear-gradient(45deg, #ef4444, #f97316);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        
+        @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: linear-gradient(90deg, #b91c1c, #dc2626);
+                padding: 2rem;
+                border-radius: 0 0 24px 24px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            }
+
+            #mapsModal .glass-card {
+                width: 95%;
+            }
+
+            #map {
+                height: 320px;
+            }
+        }
+
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    
+    <nav class="nav-bg text-white p-4 sticky top-0 z-20">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-4xl font-extrabold tracking-tight">Paw Patrol 🐾</h1>
+            <div class="flex items-center space-x-4">
+                <div id="navLinks" class="nav-links flex space-x-4">
+                    <a href="index.html" class="hover:text-white/80">Home</a>
+                    <a href="ngo-register.html" class="hover:text-white/80">NGO Register</a>
+                    <a href="vet-register.html" class="hover:text-white/80">Vet Register</a>
+                    <a href="ngo-dashboard.html" class="hover:text-white/80">NGO Dashboard</a>
+                    <a href="vet-dashboard.html" class="hover:text-white/80">Vet Dashboard</a>
+                    <a href="about.html" class="hover:text-white/80">About</a>
+                    <a href="contact.html" class="hover:text-white/80">Contact</a>
+                </div>
+                <button id="menuToggle" class="sm:hidden p-2"><i class="fas fa-bars text-2xl"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    
+    <marquee direction="right" class="text-white py-3 text-center">
+        <a href="https://drive.google.com/file/d/1du-beuQ0TN7b_j2Bdk95CoM4ya_sIQCV/view?usp=drive_link" class="marquee-link">Click here for Quick First Aid Guide</a>
+    </marquee>
+
+    
+    <div id="notificationBanner" class="hidden fixed top-0 left-0 right-0 notification-banner text-white p-4 text-center z-30 animate-slide-in">
+        <p>New report received! Please check the dashboard.</p>
+        <button id="closeBanner" class="ml-4 text-white/80 hover:text-white">Close</button>
+    </div>
+
+    
+    <section class="container mx-auto py-16 px-4 animate-fade-in">
+        <h2 class="text-5xl font-extrabold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">NGO Dashboard</h2>
+        <div id="loginSection" class="max-w-md mx-auto glass-card p-8">
+            <div class="mb-8">
+                <label class="block font-semibold mb-3 text-lg">Email</label>
+                <input type="email" id="loginEmail" class="w-full p-4" placeholder="Enter email">
+            </div>
+            <div class="mb-8">
+                <label class="block font-semibold mb-3 text-lg">Password</label>
+                <input type="password" id="loginPassword" class="w-full p-4" placeholder="Enter password">
+            </div>
+            <button id="loginBtn" class="w-full btn-vibrant px-6 py-4">Login</button>
+        </div>
+
+        <div id="dashboardSection" class="hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-semibold">Animals Rescued</h3>
+                    <p id="rescuedCount" class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">0</p>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-semibold">Pending Reports</h3>
+                    <p id="pendingCount" class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">0</p>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-semibold">Avg. Response Time</h3>
+                    <p class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">12 min</p>
+                </div>
+            </div>
+            <h3 class="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Previous Reports</h3>
+            <div id="reportList" class="space-y-4"></div>
+            <h3 class="text-3xl font-bold mb-6 mt-10 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Past Reports</h3>
+            <div id="pastReportList" class="space-y-4"></div>
+        </div>
+    </section>
+
+    
+    <div id="mapsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="glass-card p-8 rounded-3xl max-w-4xl w-full animate-fade-in">
+            <h3 class="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Rescue Tracking</h3>
+            <div id="map"></div>
+            <div class="mt-6 flex justify-between items-center">
+                <div>
+                    <p class="text-lg">Tracking: <span id="trackingStatus">Loading...</span></p>
+                </div>
+                <div class="space-x-4">
+                    <button id="reachedBtn" class="btn-vibrant px-6 py-3">Reached at Location</button>
+                    <button id="rescuedBtn" class="btn-vibrant px-6 py-3">Rescued</button>
+                    <button id="retryMap" class="btn-gray px-6 py-3 hidden">Retry Map</button>
+                    <button id="closeMapsModal" class="btn-vibrant px-6 py-3">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-[linear-gradient(135deg,#0a1a1f,#1e2f3d,#2f4a5c)] text-white py-2">
+        <div class="container mx-auto px-3 text-center">
+            <div class="flex justify-center space-x-6 mb-2">
+                <a href="https://twitter.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-twitter fa-lg"></i>
+                </a>
+                <a href="https://instagram.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-instagram fa-lg"></i>
+                </a>
+                <a href="https://facebook.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-facebook-f fa-lg"></i>
+                </a>
+                <a href="https://linkedin.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                    <i class="fab fa-linkedin-in fa-lg"></i>
+                </a>
+            </div>
+            <p class="text-[0.7rem] font-semibold mb-0.5">
+                Proudly developed during the <a href="#" class="text-[#ef4444] hover:text-[#f97316] transition-colors">TechFlix Hackin Bad Hackathon</a>
+            </p>
+            <p class="text-[0.6rem] text-gray-400">© 2025 Animal Rescue. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        let sirenAudio = new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3');
+        sirenAudio.loop = true;
+
+        
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        
+        let currentNgoEmail = null;
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const email = document.getElementById('loginEmail').value;
+            const ngo = JSON.parse(localStorage.getItem('ngo') || '{}');
+            if (email === ngo.email) {
+                currentNgoEmail = email;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                console.log(`Logged in as NGO: ${currentNgoEmail}`);
+                loadReports();
+                checkForNewReports();
+            } else {
+                alert('Invalid email');
+            }
+        });
+
+        
+        function showNotification() {
+            console.log('Showing notification for new report');
+            const playSiren = () => {
+                sirenAudio.play().then(() => {
+                    console.log('Siren playing successfully');
+                }).catch(err => {
+                    console.error('Siren play error:', err);
+                    alert('Please click anywhere on the page to enable siren audio.');
+                    document.addEventListener('click', () => {
+                        sirenAudio.play().catch(e => console.error('Retry siren error:', e));
+                    }, { once: true });
+                });
+            };
+            playSiren();
+            document.getElementById('notificationBanner').classList.remove('hidden');
+            loadReports();
+        }
+
+        
+        function stopSiren() {
+            console.log('Stopping siren');
+            sirenAudio.pause();
+            sirenAudio.currentTime = 0;
+            document.getElementById('notificationBanner').classList.add('hidden');
+        }
+
+        
+        function initMap(report) {
+            try {
+                const userLoc = report.location || { lat: 37.7749, lon: -122.4194 };
+                const ngoLoc = JSON.parse(localStorage.getItem('ngoLocation') || '{}') || { lat: 37.7749, lon: -122.4194 };
+
+                if (!userLoc.lat || !userLoc.lon || !ngoLoc.lat || !ngoLoc.lon) {
+                    console.warn('Invalid location data, using defaults');
+                    alert('Location data missing. Using default coordinates.');
+                }
+
+                document.getElementById('map').innerHTML = ''; // Clear previous map
+                const map = L.map('map').setView([userLoc.lat, userLoc.lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                const routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(ngoLoc.lat, ngoLoc.lon),
+                        L.latLng(userLoc.lat, userLoc.lon)
+                    ],
+                    routeWhileDragging: false,
+                    lineOptions: { styles: [{ color: '#ef4444', weight: 6 }] }
+                }).addTo(map);
+
+                routingControl.on('routesfound', function(e) {
+                    const route = e.routes[0];
+                    const distance = (route.summary.totalDistance / 1000).toFixed(2); // km
+                    const time = Math.round(route.summary.totalTime / 60); // minutes
+                    document.getElementById('trackingStatus').textContent = `NGO is ${distance} km away, ETA ${time} min`;
+                    console.log(`Route found: ${distance} km, ${time} min`);
+                });
+
+                const ngoMarker = L.marker([ngoLoc.lat, ngoLoc.lon]).addTo(map).bindPopup('NGO Location');
+                const userMarker = L.marker([userLoc.lat, userLoc.lon]).addTo(map).bindPopup('Reported Location').openPopup();
+                ngoMarker._icon.classList.add('pulse-marker');
+                userMarker._icon.classList.add('pulse-marker');
+
+                routingControl.on('routingerror', function(e) {
+                    console.error('Routing error:', e);
+                    document.getElementById('trackingStatus').textContent = 'Failed to load route';
+                    document.getElementById('retryMap').classList.remove('hidden');
+                });
+
+                document.getElementById('trackingStatus').textContent = 'Loading route...';
+                document.getElementById('retryMap').classList.add('hidden');
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                document.getElementById('trackingStatus').textContent = 'Failed to load map';
+                document.getElementById('retryMap').classList.remove('hidden');
+            }
+        }
+
+        
+        function loadReports() {
+            let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            let pastReports = JSON.parse(localStorage.getItem('pastReports') || '[]');
+            let declinedReports = JSON.parse(localStorage.getItem(`declinedReports_${currentNgoEmail}`) || '[]');
+
+            const reportList = document.getElementById('reportList');
+            const pastReportList = document.getElementById('pastReportList');
+            reportList.innerHTML = '';
+            pastReportList.innerHTML = '';
+
+            console.log('Active reports:', reports);
+            console.log('Past reports:', pastReports);
+            console.log('Declined reports:', declinedReports);
+
+            
+            reports.forEach(report => {
+                if (report.status === 'pending' && !declinedReports.includes(report.id.toString())) {
+                    const div = document.createElement('div');
+                    div.className = 'glass-card p-6 cursor-pointer';
+                    div.innerHTML = `
+                        <p><strong>Name:</strong> ${report.name}</p>
+                        <p><strong>Phone:</strong> ${report.phone}</p>
+                        <p><strong>Address:</strong> ${report.address}</p>
+                        <p><strong>Status:</strong> ${report.status}</p>
+                        ${report.mediaType && report.mediaType.startsWith('image/') ? 
+                            `<img src="${report.media}" class="w-full h-48 object-cover rounded-lg mt-2" onerror="this.nextElementSibling.style.display='block';this.style.display='none'"><p class="mt-2 text-red-400 hidden">Media not available</p>` :
+                            report.mediaType && report.mediaType.startsWith('video/') ? 
+                            `<video src="${report.media}" controls class="w-full h-48 object-cover rounded-lg mt-2" onerror="this.nextElementSibling.style.display='block';this.style.display='none'"></video><p class="mt-2 text-red-400 hidden">Media not available</p>` : 
+                            `<p class="mt-2 text-red-400">Media not available</p>`}
+                        <div class="flex space-x-2 mt-2">
+                            <button class="flex-1 btn-vibrant px-4 py-2 rounded-lg accept-btn" data-id="${report.id}">Accept</button>
+                            <button class="flex-1 btn-gray px-4 py-2 rounded-lg decline-btn" data-id="${report.id}">Decline</button>
+                        </div>
+                    `;
+                    reportList.appendChild(div);
+                }
+            });
+
+            
+            pastReports.forEach(report => {
+                if (report.acceptedBy === currentNgoEmail) {
+                    const div = document.createElement('div');
+                    div.className = 'glass-card p-6';
+                    div.innerHTML = `
+                        <p><strong>Name:</strong> ${report.name}</p>
+                        <p><strong>Phone:</strong> ${report.phone}</p>
+                        <p><strong>Address:</strong> ${report.address}</p>
+                        <p><strong>Status:</strong> ${report.status}</p>
+                        ${report.mediaType && report.mediaType.startsWith('image/') ? 
+                            `<img src="${report.media}" class="w-full h-48 object-cover rounded-lg mt-2" onerror="this.nextElementSibling.style.display='block';this.style.display='none'"><p class="mt-2 text-red-400 hidden">Media not available</p>` :
+                            report.mediaType && report.mediaType.startsWith('video/') ? 
+                            `<video src="${report.media}" controls class="w-full h-48 object-cover rounded-lg mt-2" onerror="this.nextElementSibling.style.display='block';this.style.display='none'"></video><p class="mt-2 text-red-400 hidden">Media not available</p>` : 
+                            `<p class="mt-2 text-red-400">Media not available</p>`}
+                    `;
+                    pastReportList.appendChild(div);
+                }
+            });
+
+            
+            document.getElementById('rescuedCount').textContent = pastReports.filter(r => r.acceptedBy === currentNgoEmail).length;
+            document.getElementById('pendingCount').textContent = reports.filter(r => r.status === 'pending' && !declinedReports.includes(r.id.toString())).length;
+
+            
+            document.querySelectorAll('.accept-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const reportId = btn.dataset.id;
+                    let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+                    const report = reports.find(r => r.id == reportId);
+                    if (report) {
+                        report.status = 'accepted';
+                        report.acceptedBy = currentNgoEmail;
+                        localStorage.setItem('reports', JSON.stringify(reports));
+                        localStorage.setItem('reportAccepted', JSON.stringify({ id: reportId }));
+                        console.log(`Report ${reportId} accepted by ${currentNgoEmail}`);
+                        stopSiren();
+                        document.getElementById('mapsModal').classList.remove('hidden');
+                        initMap(report);
+                        loadReports();
+                    }
+                });
+            });
+
+            
+            document.querySelectorAll('.decline-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const reportId = btn.dataset.id;
+                    console.log(`Declining report ID: ${reportId} for NGO: ${currentNgoEmail}`);
+                    let declinedReports = JSON.parse(localStorage.getItem(`declinedReports_${currentNgoEmail}`) || '[]');
+                    if (!declinedReports.includes(reportId.toString())) {
+                        declinedReports.push(reportId.toString());
+                        localStorage.setItem(`declinedReports_${currentNgoEmail}`, JSON.stringify(declinedReports));
+                        console.log(`Updated declined reports for ${currentNgoEmail}:`, declinedReports);
+                        stopSiren();
+                        loadReports();
+                    }
+                });
+            });
+        }
+
+        
+        document.getElementById('reachedBtn').addEventListener('click', () => {
+            let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const report = reports.find(r => r.status === 'accepted' && r.acceptedBy === currentNgoEmail);
+            if (report) {
+                report.status = 'reached';
+                localStorage.setItem('reports', JSON.stringify(reports));
+                document.getElementById('trackingStatus').textContent = 'NGO has reached the location';
+                loadReports();
+                alert('Marked as reached!');
+            }
+        });
+
+        document.getElementById('rescuedBtn').addEventListener('click', () => {
+            let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            let pastReports = JSON.parse(localStorage.getItem('pastReports') || '[]');
+            const report = reports.find(r => (r.status === 'reached' || r.status === 'accepted') && r.acceptedBy === currentNgoEmail);
+            if (report) {
+                report.status = 'rescued';
+                reports = reports.filter(r => r.id !== report.id);
+                pastReports.push(report);
+                localStorage.setItem('reports', JSON.stringify(reports));
+                localStorage.setItem('pastReports', JSON.stringify(pastReports));
+                document.getElementById('mapsModal').classList.add('hidden');
+                loadReports();
+                alert('Marked as rescued! Report moved to Past Reports.');
+            }
+        });
+
+        document.getElementById('retryMap').addEventListener('click', () => {
+            let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const report = reports.find(r => r.status === 'accepted' && r.acceptedBy === currentNgoEmail);
+            if (report) {
+                console.log('Retrying map initialization for report:', report);
+                initMap(report);
+            } else {
+                console.error('Report not found for retry');
+                alert('Report not found. Please accept a report first.');
+            }
+        });
+
+        document.getElementById('closeMapsModal').addEventListener('click', () => {
+            document.getElementById('mapsModal').classList.add('hidden');
+        });
+
+        
+        function checkForNewReports() {
+            if (currentNgoEmail && !document.getElementById('dashboardSection').classList.contains('hidden')) {
+                const newReport = JSON.parse(localStorage.getItem('newReport') || '{}');
+                if (newReport.id) {
+                    console.log('New report detected via polling:', newReport);
+                    showNotification();
+                    localStorage.removeItem('newReport');
+                }
+            }
+            setTimeout(checkForNewReports, 100);
+        }
+
+        
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'newReport' && !document.getElementById('dashboardSection').classList.contains('hidden')) {
+                const newReport = JSON.parse(event.newValue || '{}');
+                if (newReport.id) {
+                    console.log('New report detected via storage event:', newReport);
+                    showNotification();
+                    localStorage.removeItem('newReport');
+                }
+            } else if (event.key === 'reportAccepted' && !document.getElementById('dashboardSection').classList.contains('hidden')) {
+                const reportAccepted = JSON.parse(event.newValue || '{}');
+                if (reportAccepted.id) {
+                    console.log('Report accepted:', reportAccepted);
+                    stopSiren();
+                    let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+                    const report = reports.find(r => r.id == reportAccepted.id);
+                    if (report && report.acceptedBy !== currentNgoEmail) {
+                        reports = reports.filter(r => r.id != reportAccepted.id);
+                        localStorage.setItem('reports', JSON.stringify(reports));
+                        loadReports();
+                    }
+                }
+            }
+        });
+
+        document.getElementById('closeBanner').addEventListener('click', () => {
+            document.getElementById('notificationBanner').classList.add('hidden');
+        });
+
+        
+        loadReports();
+    </script>
+</body>
+</html>

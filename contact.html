@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us - Animal Rescue</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a1a1f, #1e2f3d, #2f4a5c);
+      background-size: 400%;
+      animation: gradientShift 15s ease infinite;
+      color: #ffffff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 50px rgba(220, 38, 38, 0.4);
+    }
+
+    
+    .btn-vibrant {
+      background: linear-gradient(45deg, #ef4444, #f97316);
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .btn-vibrant:hover {
+      background: linear-gradient(45deg, #b91c1c, #c2410c);
+      transform: scale(1.12);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+    }
+
+    .btn-vibrant::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+      z-index: -1;
+    }
+
+    .btn-vibrant:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    
+    .nav-bg {
+      background: linear-gradient(90deg, #b91c1c, #dc2626);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-3px);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #f97316;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-links a:hover::after {
+      width: 60%;
+    }
+
+    
+    marquee {
+      background: linear-gradient(45deg, #dc2626, #f43f5e);
+      padding: 12px 0;
+      font-weight: 600;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .marquee-link {
+      color: #ffffff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .marquee-link:hover {
+      color: #fed7aa;
+      text-decoration: underline;
+    }
+
+    
+    #map {
+      height: 480px;
+      border-radius: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    #map:hover {
+      transform: scale(1.02);
+    }
+
+    .pulse-marker {
+      background: #ef4444;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 4px solid #ffffff;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 1);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+      70% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 14px;
+      padding: 14px;
+      color: #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #f97316;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+    }
+
+    
+    .info-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    }
+
+    
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+
+      .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: linear-gradient(90deg, #b91c1c, #dc2626);
+        padding: 2rem;
+        border-radius: 0 0 24px 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      }
+
+      #map {
+        height: 320px;
+      }
+    }
+
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    
+    .leaflet-control-container .leaflet-routing-container {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  
+  <nav class="nav-bg text-white p-4 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-4xl font-extrabold tracking-tight">Paw Patrol 🐾</h1>
+      <div class="flex items-center space-x-4">
+        <div id="navLinks" class="nav-links hidden md:flex space-x-4">
+          <a href="index.html" class="hover:text-white/80">Home</a>
+          <a href="ngo-register.html" class="hover:text-white/80">NGO Register</a>
+          <a href="vet-register.html" class="hover:text-white/80">Vet Register</a>
+          <a href="ngo-dashboard.html" class="hover:text-white/80">NGO Dashboard</a>
+          <a href="vet-dashboard.html" class="hover:text-white/80">Vet Dashboard</a>
+          <a href="about.html" class="hover:text-white/80">About</a>
+          <a href="contact.html" class="hover:text-white/80">Contact</a>
+        </div>
+        <button id="menuToggle" class="md:hidden p-2"><i class="fas fa-bars text-2xl"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  
+  <marquee direction="right" class="text-white py-3 text-center">
+    <a href="https://drive.google.com/file/d/1du-beuQ0TN7b_j2Bdk95CoM4ya_sIQCV/view?usp=drive_link" class="marquee-link">Click here for Quick First Aid Guide</a>
+  </marquee>
+
+  
+  <main class="max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8 animate-fade-in">
+    <h2 class="text-5xl font-extrabold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500 uppercase">Contact Us</h2>
+    <p class="text-lg text-center mb-10">We're here to help with your queries, concerns, or feedback.</p>
+
+    <div class="grid md:grid-cols-2 gap-10 items-start">
+      
+      <div>
+        <div class="space-y-4 mb-6">
+          <div class="info-card flex items-start space-x-4 p-4">
+            <i class="fas fa-map-marker-alt text-red-600 text-xl mt-1"></i>
+            <span>123 Animal Welfare Road, Noida, India - 110001</span>
+          </div>
+          <div class="info-card flex items-start space-x-4 p-4">
+            <i class="fas fa-envelope text-red-600 text-xl mt-1"></i>
+            <span>support@pawpatrol.org</span>
+          </div>
+          <div class="info-card flex items-start space-x-4 p-4">
+            <i class="fas fa-phone text-red-600 text-xl mt-1"></i>
+            <span>+91 98765 43210</span>
+          </div>
+        </div>
+
+        <form class="glass-card p-6 space-y-4">
+          <div>
+            <label for="name" class="block font-semibold mb-3 text-lg">Your Name</label>
+            <input type="text" id="name" placeholder="Enter your name" class="w-full p-4" required />
+          </div>
+          <div>
+            <label for="email" class="block font-semibold mb-3 text-lg">Email</label>
+            <input type="email" id="email" placeholder="Enter your email" class="w-full p-4" required />
+          </div>
+          <div>
+            <label for="phone" class="block font-semibold mb-3 text-lg">Phone Number</label>
+            <input type="tel" id="phone" placeholder="Enter your phone number" class="w-full p-4" required />
+          </div>
+          <div>
+            <label for="message" class="block font-semibold mb-3 text-lg">Message</label>
+            <textarea id="message" rows="4" placeholder="Write your message" class="w-full p-4" required></textarea>
+          </div>
+          <button type="submit" class="btn-vibrant w-full px-6 py-4">Send Message</button>
+        </form>
+      </div>
+
+      
+      <div>
+        <div id="map" class="glass-card"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="bg-[linear-gradient(135deg,#0a1a1f,#1e2f3d,#2f4a5c)] text-white py-2">
+    <div class="container mx-auto px-3 text-center">
+        <div class="flex justify-center space-x-6 mb-2">
+            <a href="https://twitter.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                <i class="fab fa-twitter fa-lg"></i>
+            </a>
+            <a href="https://instagram.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                <i class="fab fa-instagram fa-lg"></i>
+            </a>
+            <a href="https://facebook.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                <i class="fab fa-facebook-f fa-lg"></i>
+            </a>
+            <a href="https://linkedin.com/yourprofile" target="_blank" class="text-white hover:text-[#f97316] transition-all duration-300 transform hover:scale-110">
+                <i class="fab fa-linkedin-in fa-lg"></i>
+            </a>
+        </div>
+        <p class="text-[0.7rem] font-semibold mb-0.5">
+            Proudly developed during the <a href="#" class="text-[#ef4444] hover:text-[#f97316] transition-colors">TechFlix Hackin Bad Hackathon</a>
+        </p>
+        <p class="text-[0.6rem] text-gray-400">© 2025 Animal Rescue. All rights reserved.</p>
+    </div>
+</footer>
+
+  
+  <script>
+    
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.classList.toggle('hidden');
+      navLinks.classList.toggle('active');
+    });
+
+    
+    function initMap() {
+      if (typeof L === 'undefined') return;
+
+      const map = L.map('map', {
+        scrollWheelZoom: false
+      }).setView([28.5355, 77.3910], 10); 
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      L.marker([28.5355, 77.3910]).addTo(map)
+        .bindPopup('Animal Rescue HQ - Noida').openPopup()
+        ._icon.classList.add('pulse-marker');
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
